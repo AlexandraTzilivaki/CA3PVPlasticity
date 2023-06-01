@@ -1,0 +1,65 @@
+
+
+
+excitatory_synapses=3//3 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ampaweightin=1.7e-3*1.6//0.8
+nmdaweightin=5.3e-3//*0.8
+
+objref  pevstiminh[numberpyrs][excitatory_synapses], devstiminh[numberpyrs][excitatory_synapses]
+objref ranpyrinput 
+
+objref pampain_back[numberpyrs][excitatory_synapses], pnmdain_back[numberpyrs][excitatory_synapses]
+objref pncampainback[numberpyrs][excitatory_synapses], pncnmdainback[numberpyrs][excitatory_synapses]
+
+meanpyrinput=0.03//0.02 //~12 Hz 0.004 gia fluctuations gia to gap to kanoniko
+
+objref ne
+ne=new NetStim(0.5)
+ne.interval=30
+ne.number=1e3/30
+ne.noise=0.0//0.04
+
+objref rp
+rp = new Random()
+rp.poisson(meanpyrinput)
+print"123"
+objref stimvectorE[numberpyrs][excitatory_synapses]
+
+for kapa=0, numberpyrs-1{
+
+for t=0,excitatory_synapses-1{
+
+	stimvectorE[kapa][t]= new Vector()
+			
+	for k=0,1000-1{//int(tstop)-1{         // $1 the tstop 
+		if(rp.repick()){
+			stimvectorE[kapa][t].append(k)
+		}
+	}
+}
+}
+
+
+proc call_vecstimpyr(){
+ranpyrinput = new Random(1)
+PIDb = ranpyrinput.uniform(0, 1)
+
+for pyr=0,numberpyrs-1 {
+for syn=0,excitatory_synapses-1 {
+
+	      pevstiminh[pyr][syn] = new VecStim(0.5)
+	      pevstiminh[pyr][syn].delay =100
+	      pevstiminh[pyr][syn].play(stimvectorE[pyr][syn])
+	       PIDb=ranpyrinput.repick()
+
+			PyramidalList.o(pyr).dend[0] pampain_back[pyr][syn]=new GLU(PIDb)
+			PyramidalList.o(pyr).dend[0] pnmdain_back[pyr][syn]=new NMDA(PIDb)
+
+			pncampainback[pyr][syn] = new NetCon(ne, pampain_back[pyr][syn], -20,500, ampaweightin)
+			pncnmdainback[pyr][syn] = new NetCon(ne, pnmdain_back[pyr][syn], -20, 500, nmdaweightin)
+	}
+	}
+	}
+	
+print "Background for PYrs ok"	
