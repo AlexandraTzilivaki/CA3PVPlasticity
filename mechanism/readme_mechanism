@@ -1,0 +1,5 @@
+This folder contains all mechanisms (in .mod file)
+please make sure to compile the modl file before running an experiment
+how to compile
+cd mechanism
+nrnivmodl
